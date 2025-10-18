@@ -151,7 +151,6 @@ class AgentService:
         
         if result.deleted_count > 0:
             # Delete related data
-            await self.db.get_collection("agent_dependencies").delete_many({"agent_id": str(agent_id)})
             await self.db.get_collection("agent_versions").delete_many({"agent_id": str(agent_id)})
             await self.db.get_collection("agent_links").delete_many({
                 "$or": [
@@ -258,18 +257,8 @@ class AgentService:
         cursor = self.db.get_collection("agent_versions").find({"agent_id": str(agent_id)}).sort("version", -1)
         versions = []
         async for doc in cursor:
-            doc["id"] = doc.pop("_id")
             versions.append(AgentVersion(**doc))
         return versions
-    
-    async def get_agent_dependencies(self, agent_id: str) -> List[AgentDependency]:
-        """Get all dependencies for an agent"""
-        cursor = self.db.get_collection("agent_dependencies").find({"agent_id": str(agent_id)})
-        dependencies = []
-        async for doc in cursor:
-            doc["id"] = doc.pop("_id")
-            dependencies.append(AgentDependency(**doc))
-        return dependencies
     
     async def validate_agent_dependencies(self, agent_id: str) -> Dict[str, List[str]]:
         """Validate that all enabled dependencies exist and are accessible"""
@@ -279,18 +268,6 @@ class AgentService:
         
         errors = []
         warnings = []
-        
-        # Validate knowledge bases
-        if agent.config.knowledge_bases.enabled:
-            for kb_item in agent.config.knowledge_bases.items:
-                if kb_item.enabled:
-                    # Check if KB exists and is active
-                    kb = await self.db.get_collection("knowledge_bases").find_one({
-                        "_id": str(kb_item.id),
-                        "status": "active"
-                    })
-                    if not kb:
-                        errors.append(f"Knowledge base {kb_item.id} not found or inactive")
         
         # Validate tools
         if agent.config.tools.enabled:

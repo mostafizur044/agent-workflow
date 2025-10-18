@@ -48,16 +48,6 @@ async def create_indexes():
     
     await database.agents.create_indexes(agents_indexes)
     
-    # Agent dependencies indexes
-    dependencies_indexes = [
-        IndexModel([("agent_id", ASCENDING)]),
-        IndexModel([("dependency_type", ASCENDING)]),
-        IndexModel([("dependency_id", ASCENDING)]),
-        IndexModel([("agent_id", ASCENDING), ("dependency_type", ASCENDING)]),
-    ]
-    
-    await database.agent_dependencies.create_indexes(dependencies_indexes)
-    
     # Agent versions indexes
     versions_indexes = [
         IndexModel([("agent_id", ASCENDING)]),

@@ -88,6 +88,7 @@ class ChunkingConfig(BaseModel):
 class KnowledgeBase(BaseModel):
     id: str = Field(..., alias="_id")
     user_id: str
+    agent_id: str
     name: str
     description: str
     status: KnowledgeBaseStatus = KnowledgeBaseStatus.ACTIVE
@@ -107,13 +108,15 @@ class KnowledgeBaseCreateRequest(BaseModel):
     name: str
     description: str
     user_id: str
-    embedding_model: Optional[EmbeddingModel] = None
-    chunking_config: Optional[ChunkingConfig] = None
+    agent_id: str
+    embedding_model: EmbeddingModel = None
+    chunking_config: ChunkingConfig = None
 
 
 class KnowledgeBaseUpdateRequest(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    agent_id: str
     embedding_model: Optional[EmbeddingModel] = None
     chunking_config: Optional[ChunkingConfig] = None
 

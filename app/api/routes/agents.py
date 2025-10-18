@@ -142,27 +142,6 @@ async def get_agent_versions(
     versions = await agent_service.get_agent_versions(agent_id)
     return versions
 
-
-@router.get("/{agent_id}/dependencies", response_model=List[AgentDependency])
-async def get_agent_dependencies(
-    agent_id: str,
-    agent_service: AgentService = Depends(get_agent_service)
-):
-    """Get all dependencies for an agent"""
-    dependencies = await agent_service.get_agent_dependencies(agent_id)
-    return dependencies
-
-
-@router.post("/{agent_id}/validate", response_model=dict)
-async def validate_agent_dependencies(
-    agent_id: str,
-    agent_service: AgentService = Depends(get_agent_service)
-):
-    """Validate agent dependencies"""
-    validation = await agent_service.validate_agent_dependencies(agent_id)
-    return validation
-
-
 # Component management endpoints
 
 @router.post("/{agent_id}/knowledge-bases", response_model=Agent)

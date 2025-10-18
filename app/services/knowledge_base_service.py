@@ -44,14 +44,12 @@ class KnowledgeBaseService:
         kb_id = str(uuid4())
         now = datetime.now()
         
-        # Create collection name
-        collection_name = f"kb_{kb_id}".replace("-", "_")
-        
+        collection_name = request.agent_id + "::" + request.embedding_model.model_name
         # Create Qdrant collection
         self.qdrant_client.create_collection(
             collection_name=collection_name,
             vectors_config=VectorParams(
-                size=1536,  # OpenAI ada-002 embedding size
+                size=request.embedding_model.dimension,
                 distance=Distance.COSINE
             )
         )
@@ -83,7 +81,6 @@ class KnowledgeBaseService:
         """Get knowledge base by ID"""
         doc = await self.db.get_collection("knowledge_bases").find_one({"_id": str(kb_id)})
         if doc:
-            doc["id"] = doc.pop("_id")
             return KnowledgeBase(**doc)
         return None
     
@@ -92,7 +89,6 @@ class KnowledgeBaseService:
         cursor = self.db.get_collection("knowledge_bases").find({"user_id": user_id}).sort("created_at", -1)
         knowledge_bases = []
         async for doc in cursor:
-            doc["id"] = doc.pop("_id")
             knowledge_bases.append(KnowledgeBase(**doc))
         return knowledge_bases
     
